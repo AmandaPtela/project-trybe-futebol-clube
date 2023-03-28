@@ -10,7 +10,7 @@ export default class teamsService {
 
   static async getTeamById(id: number): Promise<ITeams | null> {
     const team: ITeams | null = await Teams.findOne({ where: { id } });
-    console.log('return 1 time', team);
+    // console.log('return 1 time', team);
     return team;
   }
 }
