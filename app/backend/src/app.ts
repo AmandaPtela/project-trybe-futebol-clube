@@ -17,6 +17,8 @@ class App {
     this.app.get('/teams', teamsController.getAll);
     this.app.get('/users', usersController.getAll);
     this.app.get('/matches', matchesController.getAll);
+    this.app.post('/login', usersController.login);
+    this.app.get('/teams/:id', teamsController.getTeamById);
   }
 
   private config():void {
