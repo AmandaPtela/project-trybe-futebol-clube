@@ -2,6 +2,7 @@ import * as express from 'express';
 import matchesController from './controllers/matchesController';
 import teamsController from './controllers/teamsController';
 import usersController from './controllers/usersController';
+import valid from './utils/validateToken';
 
 class App {
   public app: express.Express;
@@ -18,6 +19,7 @@ class App {
     this.app.get('/users', usersController.getAll);
     this.app.get('/matches', matchesController.getAll);
     this.app.post('/login', usersController.login);
+    this.app.get('/login', valid, usersController.validate);
     this.app.get('/teams/:id', teamsController.getTeamById);
   }
 
