@@ -12,10 +12,10 @@ async function valid(req: Request, res: Response, next: NextFunction): Promise<o
       return res.status(401).json({ message: 'Token not found' });
     }
     const payload = jwt.verify(authorization, secret);
-
+    console.log(payload);
     req.cookies = payload;
   } catch (error) {
-    return res.status(401).json({ message: 'Expired or invalid token' });
+    return res.status(401).json({ message: 'Token must be a valid token' });
   }
   next();
 }

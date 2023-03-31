@@ -17,8 +17,7 @@ export default class usersController {
 
   static async validate(request: Request, response: Response): Promise<object> {
     const user = request.cookies;
-    const userOk: object | null = await userService.validate(user);
-    if (userOk === null) return response.status(200).json({ message: 'login ok' });
-    return response.status(401).json({ message: 'login not koo' });
+    const userOk: string | undefined = await userService.validate(user);
+    return response.status(200).json({ role: userOk });
   }
 }
