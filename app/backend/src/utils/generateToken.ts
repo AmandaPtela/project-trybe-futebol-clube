@@ -5,9 +5,14 @@ const configJwt: object = {
   algorithm: 'HS256',
 };
 
-function generateToken(payload: object) {
-  const token: string = jwt.sign(payload, 'secret', configJwt);
+const secret = process.env.JWT_SECRET || 'secret';
+
+export function generateToken(payload: object) {
+  const token: string = jwt.sign(payload, secret, configJwt);
   return token;
 }
 
-export default generateToken;
+export function decode(token: string) {
+  const decoded = jwt.verify(token, secret, configJwt);
+  return decoded;
+}

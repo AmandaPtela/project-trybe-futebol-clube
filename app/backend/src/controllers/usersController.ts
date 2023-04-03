@@ -11,7 +11,8 @@ export default class usersController {
   static async login(request: Request, response: Response): Promise<object> {
     const user = request.body;
     const login: string = await userService.login(user);
-    if (login.length > 30) return response.status(200).json({ token: login });
+
+    if (!login.includes('Invalid')) return response.status(200).json({ token: login });
     return response.status(401).json({ message: login });
   }
 

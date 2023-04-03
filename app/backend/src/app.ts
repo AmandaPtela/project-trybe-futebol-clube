@@ -3,6 +3,7 @@ import matchesController from './controllers/matchesController';
 import teamsController from './controllers/teamsController';
 import usersController from './controllers/usersController';
 import valid from './utils/validateToken';
+import login from './utils/validateLogin';
 
 class App {
   public app: express.Express;
@@ -18,7 +19,7 @@ class App {
     this.app.get('/teams', teamsController.getAll);
     this.app.get('/users', usersController.getAll);
     this.app.get('/matches', matchesController.getAll);
-    this.app.post('/login', usersController.login);
+    this.app.post('/login', login, usersController.login);
     this.app.get('/login/role', valid, usersController.validate);
     this.app.get('/teams/:id', teamsController.getTeamById);
   }

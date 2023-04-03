@@ -1,12 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
-// import Users from '../database/models/usersModel';
-// const userService = require('../SERVICES/userService');
 
 async function valid(req: Request, res: Response, next: NextFunction): Promise<object | undefined> {
   try {
     const { authorization } = req.headers;
-    const secret = 'secret';
+    const secret = process.env.JWT_SECRET || 'secret';
 
     if (!authorization) {
       return res.status(401).json({ message: 'Token not found' });
