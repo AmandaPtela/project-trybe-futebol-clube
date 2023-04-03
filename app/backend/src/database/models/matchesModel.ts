@@ -19,22 +19,26 @@ Matches.init({
     type: DataTypes.INTEGER,
   },
 
-  homeTeam: {
+  homeTeamId: {
+    field: 'home_team_id',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
 
   homeTeamGoals: {
+    field: 'home_team_goals',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
 
-  awayTeam: {
+  awayTeamId: {
+    field: 'away_team_id',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
 
   awayTeamGoals: {
+    field: 'away_team_goals',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
@@ -52,13 +56,23 @@ Matches.init({
 });
 
 Teams.hasMany(Matches, {
-  foreignKey: 'homeTeam',
+  foreignKey: 'home_team_id',
+  as: 'homeTeam',
+});
+
+Teams.hasMany(Matches, {
+  foreignKey: 'away_team_id',
+  as: 'awayTeam',
+});
+
+Matches.belongsTo(Teams, {
+  foreignKey: 'home_team_id',
   as: 'homeTeam',
 });
 
 Matches.belongsTo(Teams, {
-  foreignKey: 'homeTeam',
-  as: 'home_team_id',
+  foreignKey: 'away_team_id',
+  as: 'awayTeam',
 });
 
 export default Matches;

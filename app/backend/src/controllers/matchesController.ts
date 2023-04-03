@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
-import matchesService from '../services/teamsService';
+import matchesService from '../services/matchesService';
 
 export default class matchesController {
-  static async getAll(_request: Request, response: Response): Promise<object> {
-    const allMatches = await matchesService.getAll();
+  static async getAll(request: Request, response: Response): Promise<object> {
+    const query = request.query.inProgress;
+    console.log(query);
+    const matches = await matchesService.getAll(String(query));
     // console.log('todos os matches');
-    return response.status(200).json(allMatches);
+    return response.status(200).json(matches);
   }
 }
