@@ -4,9 +4,9 @@ import Teams from './teamsModel';
 
 class Matches extends Model {
   declare id: number;
-  declare homeTeam: number;
+  declare homeTeamId: number;
   declare homeTeamGoals: number;
-  declare awayTeam: number;
+  declare awayTeamId: number;
   declare awayTeamGoals: number;
   declare inProgress: boolean;
 }
@@ -20,25 +20,21 @@ Matches.init({
   },
 
   homeTeamId: {
-    field: 'home_team_id',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
 
   homeTeamGoals: {
-    field: 'home_team_goals',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
 
   awayTeamId: {
-    field: 'away_team_id',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
 
   awayTeamGoals: {
-    field: 'away_team_goals',
     allowNull: false,
     type: DataTypes.INTEGER,
   },
