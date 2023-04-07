@@ -2,6 +2,7 @@ import * as express from 'express';
 import matchesController from './controllers/matchesController';
 import teamsController from './controllers/teamsController';
 import usersController from './controllers/usersController';
+import leaderboardController from './controllers/leaderboardController';
 import valid from './utils/validateToken';
 import login from './utils/validateLogin';
 import match from './utils/validateMatch';
@@ -26,6 +27,7 @@ class App {
     this.app.post('/login', login, usersController.login);
     this.app.get('/login/role', valid, usersController.validate);
     this.app.get('/teams/:id', teamsController.getTeamById);
+    this.app.get('/leaderboard/home', leaderboardController.getLeaderboard);
   }
 
   private config():void {
