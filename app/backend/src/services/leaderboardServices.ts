@@ -8,18 +8,18 @@ import IGoals from '../database/interfaces/IGoals';
 // import Matches from '../database/models/matchesModel';
 
 export default class leaderboardService {
-  static async getLeaderboard(): Promise<ILeaderboard[]> {
+  static async getLeaderboard(url: string): Promise<ILeaderboard[]> {
     const allMatches = await matchesService.getAll('false');
     const teams: ITeams[] = await teamsService.getAll();
-    const tabela = this.dataTeams(teams, allMatches);
-    return tabela;
+    const tabela = this.data(url, teams, allMatches);
+    return this.sortMatches(await tabela);
   }
 
-  static async dataTeams(teams: ITeams[], allMatches: IMatches[]): Promise<ILeaderboard[]> {
+  static async data(url: string, teams: ITeams[], allMatches: IMatches[]): Promise<ILeaderboard[]> {
     const data: ILeaderboard[] = [];
     teams.forEach(async (team) => {
-      const totalP = (await this.statsCount(team.id, allMatches));
-      const totalG = (await this.gamesCount(team.id, allMatches));
+      const totalP = (await this.statsCount(url, team.id, allMatches));
+      const totalG = (await this.gamesCount(url, team.id, allMatches));
       data.push({
         name: team.teamName,
         totalPoints: totalP.totalPoints,
@@ -37,10 +37,13 @@ export default class leaderboardService {
   }
 
   // Quant de jogos jogados
-  static async gamesCount(id: number, matches: IMatches[]): Promise<IGoals> {
-    const teamMatch = matches.filter((match) => match.homeTeamId === id);
+  static async gamesCount(url: string, id: number, matches: IMatches[]): Promise<IGoals> {
+    let teamMatch = [];
+    if (url === 'home') {
+      teamMatch = matches.filter((match) => match.homeTeamId === id);
+    }
+    teamMatch = matches.filter((match) => match.awayTeamId === id);
     let count = 0;
-
     teamMatch.forEach(() => { count += 1; });
     let goalsOwn = 0;
     let goalsFavor = 0;
@@ -51,13 +54,13 @@ export default class leaderboardService {
       goalsFavor = match.awayTeamGoals;
       allGoals = match.homeTeamGoals - match.awayTeamGoals;
     });
-
     return { home: goalsOwn, away: goalsFavor, totalGoals: allGoals, totalGames: count };
   }
 
   // Conta Vitorias, derrotas e empates
-  static async statsCount(id: number, matches: IMatches[]): Promise<IStatus> {
-    const matchesTeam = matches.filter((match) => match.homeTeamId === id);
+  static async statsCount(url: string, id: number, matches: IMatches[]): Promise<IStatus> {
+    let matchesTeam = matches.filter((match) => match.awayTeamId === id);
+    if (url === 'home') { matchesTeam = matches.filter((match) => match.homeTeamId === id); }
     let victory = 0;
     let draw = 0;
     let def = 0;
@@ -75,5 +78,19 @@ export default class leaderboardService {
     return ({
       totalVictories: victory, totalLosses: def, totalDraws: draw, totalPoints: total, eff: effi,
     });
+  }
+
+  static async sortMatches(matches: ILeaderboard[]) {
+    const sorted: ILeaderboard[] = matches.sort((b, a) => {
+      if (a.totalPoints === b.totalPoints) {
+        if (a.goalsBalance === b.goalsBalance) {
+          return a.goalsFavor - b.goalsFavor;
+        }
+
+        return a.goalsBalance - b.goalsBalance;
+      }
+      return a.totalPoints - b.totalPoints;
+    });
+    return sorted;
   }
 }

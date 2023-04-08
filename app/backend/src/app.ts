@@ -28,6 +28,7 @@ class App {
     this.app.get('/login/role', valid, usersController.validate);
     this.app.get('/teams/:id', teamsController.getTeamById);
     this.app.get('/leaderboard/home', leaderboardController.getLeaderboard);
+    this.app.get('/leaderboard/away', leaderboardController.getLeaderboard);
   }
 
   private config():void {
