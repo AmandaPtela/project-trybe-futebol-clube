@@ -8,4 +8,10 @@ export default class leaderboardController {
     // console.log('todos os leaderboard', leaderboard);
     return response.status(200).json(leaderboard);
   }
+
+  static async getAllLeaderboard(_request: Request, response: Response): Promise<object> {
+    const leaderboard = await leaderboardService.getLeaderboard('all');
+    // console.log('todos os leaderboard', leaderboard);
+    return response.status(200).json(leaderboard);
+  }
 }

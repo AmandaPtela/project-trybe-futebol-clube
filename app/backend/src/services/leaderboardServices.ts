@@ -11,11 +11,15 @@ export default class leaderboardService {
   static async getLeaderboard(url: string): Promise<ILeaderboard[]> {
     const allMatches = await matchesService.getAll('false');
     const teams: ITeams[] = await teamsService.getAll();
-    const tabela = this.data(url, teams, allMatches);
-    return this.sortMatches(await tabela);
+    if (url === 'all') {
+      const tabela = this.each('all', teams, allMatches);
+      return (await tabela).sort(this.sortLeaderboard);
+    }
+    const tabela = this.each(url, teams, allMatches);
+    return (await tabela).sort(this.sortLeaderboard);
   }
 
-  static async data(url: string, teams: ITeams[], allMatches: IMatches[]): Promise<ILeaderboard[]> {
+  static async each(url: string, teams: ITeams[], allMatches: IMatches[]): Promise<ILeaderboard[]> {
     const data: ILeaderboard[] = [];
     teams.forEach(async (team) => {
       const totalP = (await this.statsCount(url, team.id, allMatches));
@@ -38,11 +42,13 @@ export default class leaderboardService {
 
   // Quant de jogos jogados
   static async gamesCount(url: string, id: number, matches: IMatches[]): Promise<IGoals> {
-    let teamMatch = [];
+    let teamMatch: IMatches[] = [];
     if (url === 'home') {
       teamMatch = matches.filter((match) => match.homeTeamId === id);
     }
-    teamMatch = matches.filter((match) => match.awayTeamId === id);
+    if (url === 'away') {
+      teamMatch = matches.filter((match) => match.awayTeamId === id);
+    }
     let count = 0;
     teamMatch.forEach(() => { count += 1; });
     let goalsOwn = 0;
@@ -80,17 +86,11 @@ export default class leaderboardService {
     });
   }
 
-  static async sortMatches(matches: ILeaderboard[]) {
-    const sorted: ILeaderboard[] = matches.sort((b, a) => {
-      if (a.totalPoints === b.totalPoints) {
-        if (a.goalsBalance === b.goalsBalance) {
-          return a.goalsFavor - b.goalsFavor;
-        }
-
-        return a.goalsBalance - b.goalsBalance;
-      }
-      return a.totalPoints - b.totalPoints;
-    });
-    return sorted;
+  static sortLeaderboard(a: ILeaderboard, b: ILeaderboard) {
+    return b.totalPoints - a.totalPoints
+    || b.totalVictories - a.totalVictories
+    || b.goalsBalance - a.goalsBalance
+    || b.goalsFavor - a.goalsFavor
+    || b.goalsOwn - a.goalsFavor;
   }
 }

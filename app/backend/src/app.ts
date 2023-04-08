@@ -29,6 +29,7 @@ class App {
     this.app.get('/teams/:id', teamsController.getTeamById);
     this.app.get('/leaderboard/home', leaderboardController.getLeaderboard);
     this.app.get('/leaderboard/away', leaderboardController.getLeaderboard);
+    this.app.get('/leaderboard', leaderboardController.getAllLeaderboard);
   }
 
   private config():void {
