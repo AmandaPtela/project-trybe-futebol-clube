@@ -13,10 +13,13 @@ export default class leaderboardService {
     const teams: ITeams[] = await teamsService.getAll();
     if (url === 'all') {
       const tabela = this.each('all', teams, allMatches);
-      return (await tabela).sort(this.sortLeaderboard);
+      return (await tabela).reverse();
     }
     const tabela = this.each(url, teams, allMatches);
-    return (await tabela).sort(this.sortLeaderboard);
+    console.log((await tabela).length);
+    const sortP = (await tabela).sort(leaderboardService.comparePoints);
+    // const sortV = sortP.sort(leaderboardService.compareVitories);
+    return sortP.reverse();
   }
 
   static async each(url: string, teams: ITeams[], allMatches: IMatches[]): Promise<ILeaderboard[]> {
@@ -56,9 +59,9 @@ export default class leaderboardService {
     let allGoals = 0;
 
     teamMatch.forEach((match) => {
-      goalsOwn = match.homeTeamGoals;
-      goalsFavor = match.awayTeamGoals;
-      allGoals = match.homeTeamGoals - match.awayTeamGoals;
+      goalsOwn += match.homeTeamGoals;
+      goalsFavor += match.awayTeamGoals;
+      allGoals = goalsOwn - goalsFavor;
     });
     return { home: goalsOwn, away: goalsFavor, totalGoals: allGoals, totalGames: count };
   }
@@ -70,27 +73,25 @@ export default class leaderboardService {
     let victory = 0;
     let draw = 0;
     let def = 0;
-    let victoryPoints = 0;
-    let drawPoints = 0;
     let total = 0;
 
     matchesTeam.forEach((match) => {
-      if (match.homeTeamGoals > match.awayTeamGoals) { victory += 1; victoryPoints += 3; }
-      if (match.homeTeamGoals === match.awayTeamGoals) { draw += 1; drawPoints += 1; }
-      if (match.homeTeamGoals < match.awayTeamGoals) { def += 1; }
+      if (match.homeTeamGoals > match.awayTeamGoals) { total += 3; victory += 1; }
+      if (match.homeTeamGoals === match.awayTeamGoals) { total += 1; draw += 1; }
+      if (match.homeTeamGoals < match.awayTeamGoals) def += 1;
     });
-    total = victoryPoints + drawPoints;
+
     const effi = Number(((total / (matchesTeam.length * 3)) * 100).toFixed(2));
     return ({
       totalVictories: victory, totalLosses: def, totalDraws: draw, totalPoints: total, eff: effi,
     });
   }
 
-  static sortLeaderboard(a: ILeaderboard, b: ILeaderboard) {
-    return b.totalPoints - a.totalPoints
-    || b.totalVictories - a.totalVictories
-    || b.goalsBalance - a.goalsBalance
-    || b.goalsFavor - a.goalsFavor
-    || b.goalsOwn - a.goalsFavor;
+  static comparePoints(a: ILeaderboard, b: ILeaderboard) {
+    return (a.totalPoints - b.totalPoints)
+      || (a.totalVictories - b.totalVictories)
+      || (a.goalsBalance - b.goalsBalance)
+      || (a.goalsFavor - b.goalsFavor)
+      || (a.goalsOwn - b.goalsOwn);
   }
 }
